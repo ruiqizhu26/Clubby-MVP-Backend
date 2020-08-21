@@ -2,72 +2,79 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-association_table = Table('association', Base.metadata,
-    Column('club_id', Integer, ForeignKey('club.id')),
-    Column('user_id', Integer, ForeignKey('user.id'))
+association_table = db.Table('association', db.Model.metadata,
+    db.Column('club_id', db.Integer, db.ForeignKey('club.id')),
+    db.Column('student_id', db.Integer, db.ForeignKey('student.id'))
 )
 
 class InfoSession(db.Model):
     __tablename__ = 'info_session'
-    id = db.Column(db.Integer, primaryKey=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
     time = db.Column(db.String, nullable=False)
     location = db.Column(db.String, nullable=False)
-    club_id = db.Column(db.Integer, foreignKey='club.id')
-    club = db.relationship('Club', back_populates='info_session')
+    club_id = db.Column(db.Integer, db.ForeignKey('club.id'))
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.time = kwargs.get('time')
-        self.location = kwargs.get('location')
+        self.id = kwargs.get('id', '')
+        self.time = kwargs.get('time', '')
+        self.location = kwargs.get('location', '')
+        self.club_id = kwargs.get('club_id', '')
 
     def serialzie(self):
         return {
             'id': self.id,
             'time': self.time,
-            'location': self.location
+            'location': self.location,
+            'club_id': self.club_id
         }
 
 
 class Position(db.Model):
     __tablename__ = 'position'
-    id = db.Column(db.Integer, primaryKey=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Integer, nullable=False)
     link = db.Column(db.String, nullable=False)
     deadline = db.Column(db.String, nullable=False)
-    club_id = db.Column(db.Integer, foreignKey='club.id') 
-    club = db.relationship('Club', back_populates='position')
+    club_id = db.Column(db.Integer, db.ForeignKey('club.id')) 
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.name = kwargs.get('name')
-        self.link = kwargs.get('link')
-        self.deadline = kwargs.get('deadline')
+        self.id = kwargs.get('id', '')
+        self.name = kwargs.get('name', '')
+        self.link = kwargs.get('link', '')
+        self.deadline = kwargs.get('deadline', '')
+        self.club_id = kwargs.get('club_id', '')
 
     def serialze():
         return {
             'id': self.id,
             'name': self.name,
             'link': self.link,
-            'deadline': self.deadline
+            'deadline': self.deadline,
+            'club_id': self.club_id
         }
 
 
 class Club(db.Model):
     __tablename__ = "club"
-    id = db.Column(db.Integer, primaryKey=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     image = db.Column(db.String, nullable=False)
     website = db.Column(db.String, nullable=False)
     portal = db.Column(db.String, nullable=False)
     status = db.Column(db.String, nullable=False)
 
-    info_sessions = db.relationship('InfoSession', back_populates='club')
-    positions = db.relationship('Position', back_populates='club')
-    students = db.relationship("Student", secondary=association_table, back_populates='club')
+    info_sessions = db.relationship('InfoSession', cascade='delete')
+    positions = db.relationship('Position', cascade='delete')
+    students = db.relationship("Student", secondary=association_table, back_populates='clubs')
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id')
-        self.name = kwargs.get('name')
+        self.id = kwargs.get('id', '')
+        self.name = kwargs.get('name', '')
+        self.image = kwargs.get('image', '')
+        self.website = kwargs.get('website', '')
+        self.portal = kwargs.get('portal', '')
+        self.status = kwargs.get('status', '')
 
     def serialize():
         return {
@@ -76,21 +83,23 @@ class Club(db.Model):
             'image': self.image,
             'website': self.website,
             'portal': self.portal,
-            'status': self.status
+            'status': self.status,
+            'info_sessions': [s.serialize() for s in self.info_sessions],
+            'positions': [p.serialize() for p in self.positions],
+            'students': [t.id for t in self.students]
         }
 
 class Student(db.Model):
     __tablename__ = "student"
-    id = db.Column(db.Integer, primaryKey=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
-    clubs = db.relationship('Club', secondary=association_table, back_populates='student')
+    clubs = db.relationship('Club', secondary=association_table, back_populates='students')
 
     def __init__(self, **kwargs):
         self.email = kwargs.get('email')
-        self.clubs = kwargs.get('clubs')
 
     def serialize():
         return {
             'email': self.email,
-            'clubs': self.clubs
+            'clubs': [c.id for c in self.clubs]
         }
