@@ -85,7 +85,9 @@ def delete_position(position_id):
         return json.dumps({"Success": False, "data": "Position does not exist!"}), 400
 
 
-# Called by frontend
+####################
+# SHOULD BE CALLED BY FRONTEND
+####################
 @app.route("/api/clubs", methods=["GET"])
 def get_all_clubs():
     return json.dumps({'Success': True, 'data': [c.serialize() for c in Club.query.all()]}), 200
@@ -176,7 +178,9 @@ def get_student(student_id):
         return json.dumps({"Success": False, "data": "Student does not exist!"}), 400
 
 
-# Called by frontend
+####################
+# SHOULD BE CALLED BY FRONTEND
+####################
 @app.route("/api/student", methods=["POST"])
 def create_student():
     body = json.loads(request.data)
