@@ -16,14 +16,15 @@ class InfoSession(db.Model):
     club_id = db.Column(db.Integer, db.ForeignKey('club.id'))
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id', '')
+        self.name = kwargs.get('name', '')
         self.time = kwargs.get('time', '')
         self.location = kwargs.get('location', '')
         self.club_id = kwargs.get('club_id', '')
 
-    def serialzie(self):
+    def serialize(self):
         return {
             'id': self.id,
+            'name': self.name,
             'time': self.time,
             'location': self.location,
             'club_id': self.club_id
@@ -39,13 +40,12 @@ class Position(db.Model):
     club_id = db.Column(db.Integer, db.ForeignKey('club.id')) 
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id', '')
         self.name = kwargs.get('name', '')
         self.link = kwargs.get('link', '')
         self.deadline = kwargs.get('deadline', '')
         self.club_id = kwargs.get('club_id', '')
 
-    def serialze():
+    def serialize(self):
         return {
             'id': self.id,
             'name': self.name,
@@ -69,14 +69,13 @@ class Club(db.Model):
     students = db.relationship("Student", secondary=association_table, back_populates='clubs')
 
     def __init__(self, **kwargs):
-        self.id = kwargs.get('id', '')
         self.name = kwargs.get('name', '')
         self.image = kwargs.get('image', '')
         self.website = kwargs.get('website', '')
         self.portal = kwargs.get('portal', '')
         self.status = kwargs.get('status', '')
 
-    def serialize():
+    def serialize(self):
         return {
             "id": self.id,
             "name": self.name,
@@ -98,7 +97,7 @@ class Student(db.Model):
     def __init__(self, **kwargs):
         self.email = kwargs.get('email')
 
-    def serialize():
+    def serialize(self):
         return {
             'email': self.email,
             'clubs': [c.id for c in self.clubs]
