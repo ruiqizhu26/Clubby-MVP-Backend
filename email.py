@@ -1,5 +1,11 @@
 import smtplib
-import time
+
+from db import db, InfoSession, Position, Club, Student
+
+contacts = []
+students = Student.query.all()
+for s in students:
+    contacts.append(s.email)
 EMAIL_ADDRESS = 'cw655@cornell.edu'
 EMAIL_PASSWORD = 'jaayoaduebnvenkv'
 
@@ -14,4 +20,5 @@ body = 'Clubby email notification is working now.'
 
 msg = f'Subject: {subject}\n\n{body}'
 
-smtplibObj.sendmail(EMAIL_ADDRESS, 'rz327@cornell.edu', msg)
+for a in contacts:
+    smtplibObj.sendmail(EMAIL_ADDRESS, a, msg), msg)
