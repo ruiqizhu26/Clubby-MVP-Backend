@@ -21,4 +21,4 @@ body = 'Clubby email notification is working now.'
 msg = f'Subject: {subject}\n\n{body}'
 
 for a in contacts:
-    smtplibObj.sendmail(EMAIL_ADDRESS, a, msg), msg)
+    smtplibObj.sendmail(EMAIL_ADDRESS, a, msg)
