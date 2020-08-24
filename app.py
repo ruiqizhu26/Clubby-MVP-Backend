@@ -1,10 +1,12 @@
 from flask import Flask, request
 from db import db, InfoSession, Position, Club, Student
+from flask_cors import CORS
 import json
 
 # Define db filename
 db_filename = "data.db"
 app = Flask(__name__)
+CORS(app)
 
 # Setup config
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_filename}"
@@ -150,7 +152,7 @@ def update_club(club_id):
         return json.dumps({"Success": True, "data": club.serialize()}), 201
     else:
         return json.dumps({"Success": False, "data": "Club does not exist!"}), 201
-    
+
 
 @app.route("/api/club/delete/<int:club_id>", methods=["POST"])
 def delete_club(club_id):
@@ -166,7 +168,6 @@ def delete_club(club_id):
 @app.route("/api/students", methods=["GET"])
 def get_all_students():
     return json.dumps({'Success': True, 'data': [t.serialize() for t in Student.query.all()]}), 200
-
 
 
 @app.route("/api/student/<int:student_id>", methods=["GET"])
