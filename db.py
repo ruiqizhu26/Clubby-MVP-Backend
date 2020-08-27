@@ -59,7 +59,7 @@ class Club(db.Model):
     __tablename__ = "club"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    image = db.Column(db.String, unique=True, nullable=False)
+    image = db.Column(db.String, unique=False, nullable=False)
     image_name = db.Column(db.String, nullable=False)
     mime_type = db.Column(db.String, nullable=False)
     website = db.Column(db.String, nullable=False)

@@ -273,7 +273,10 @@ def send_email(club_id):
         print(contacts)
 
         for a in contacts:
-            smtplibObj.sendmail(EMAIL_ADDRESS, a, msg)
+            try:
+                smtplibObj.sendmail(EMAIL_ADDRESS, a, msg)
+            except:
+                print("Internal error")
             
         return json.dumps({"Success": True, "data": "Emails successfully sent!"}), 201
     
