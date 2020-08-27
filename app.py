@@ -190,7 +190,7 @@ def delete_club(club_id):
         return json.dumps({"Success": False, "data": "Club does not exist!"}), 400
 
 
-@app.route("/api/students", methods=["GET"])
+@app.route("/api/students/", methods=["GET"])
 def get_all_students():
     return json.dumps({'Success': True, 'data': [t.serialize() for t in Student.query.all()]}), 200
 
@@ -248,32 +248,34 @@ def send_email(club_id):
     club = Club.query.filter_by(id=club_id).first()
     if club is not None:
         students = club.serialize().get("students")
-        print(students)
         contacts = []
         for student_id in students:
+            print("student_id is: ")
+            print(student_id)
             student = Student.query.filter_by(id=student_id).first()
             if student is not None:
+                print("inside")
                 contacts.append(student.email)
 
-            EMAIL_ADDRESS = 'rz327@cornell.edu'
-            EMAIL_PASSWORD = '<Ruiqi passwrod>'
+        EMAIL_ADDRESS = 'rz327@cornell.edu'
+        EMAIL_PASSWORD = 'jiqlphyelbbuioam'
 
-            smtplibObj = smtplib.SMTP('smtp.gmail.com', 587)
-            smtplibObj.ehlo()
-            smtplibObj.starttls()
-            smtplibObj.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        smtplibObj = smtplib.SMTP('smtp.gmail.com', 587)
+        smtplibObj.ehlo()
+        smtplibObj.starttls()
+        smtplibObj.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-            subject = 'Clubby Email Notification'
-            body = 'Clubby email notification is working now.'
+        subject = 'Clubby Email Notification'
+        body = 'Clubby email notification is working now.'
 
-            msg = f'Subject: {subject}\n\n{body}'
+        msg = f'Subject: {subject}\n\n{body}'
 
-            print(contacts)
+        print(contacts)
 
-            for a in contacts:
-                smtplibObj.sendmail(EMAIL_ADDRESS, a, msg)
+        for a in contacts:
+            smtplibObj.sendmail(EMAIL_ADDRESS, a, msg)
             
-            return json.dumps({"Success": True, "data": "Emails successfully sent!"}), 201
+        return json.dumps({"Success": True, "data": "Emails successfully sent!"}), 201
     
     else:
         return json.dumps({"Success": False, "data": "Club does not exist!"}), 400
