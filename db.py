@@ -59,7 +59,9 @@ class Club(db.Model):
     __tablename__ = "club"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    image = db.Column(db.String, nullable=False)
+    image = db.Column(db.String, unique=True, nullable=False)
+    image_name = db.Column(db.String, nullable=False)
+    mime_type = db.Column(db.String, nullable=False)
     website = db.Column(db.String, nullable=False)
     portal = db.Column(db.String, nullable=False)
     status = db.Column(db.String, nullable=False)
@@ -70,7 +72,9 @@ class Club(db.Model):
 
     def __init__(self, **kwargs):
         self.name = kwargs.get('name', '')
-        self.image = kwargs.get('image', '')
+        self.image = ''
+        self.image_name = ''
+        self.mime_type = ''
         self.website = kwargs.get('website', '')
         self.portal = kwargs.get('portal', '')
         self.status = kwargs.get('status', '')
@@ -79,7 +83,8 @@ class Club(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            'image': self.image,
+            "image_name": self.image_name,
+            "mime_type": self.mime_type,
             'website': self.website,
             'portal': self.portal,
             'status': self.status,
