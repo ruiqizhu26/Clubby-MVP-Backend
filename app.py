@@ -220,14 +220,43 @@ def create_student():
     existing_student = Student.query.filter_by(email=email).first()
     if existing_student is not None:
         db.session.delete(existing_student)
+
+    club_list = []
     for id in club_ids:
         club = Club.query.filter_by(id=id).first()
         if club is not None:
             student.clubs.append(club)
+            club_list.append(club.name)
         else:
             return json.dumps({"Success": False, "data": "Club does not exist!"}), 201
+
     db.session.add(student)
     db.session.commit()
+
+    EMAIL_ADDRESS = 'cornellclubby@gmail.com'
+    EMAIL_PASSWORD = 'niwdyzolidduwmug'
+
+    smtplibObj = smtplib.SMTP('smtp.gmail.com', 587)
+    smtplibObj.ehlo()
+    smtplibObj.starttls()
+    smtplibObj.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+    club_message = ''
+    for club in club_list:
+        club_message += club + '\n    '
+
+    subject = 'Clubby confirmation email'
+    body = '    You have successfully registered in our Clubby notification system! Here is a list of ' + (
+    'project teams you subscribed: \n\n    ') + club_message + '\n    You will receive email notification when ' + (
+    'these teams update their application info.')
+
+    msg = f'Subject: {subject}\n\n{body}'
+
+    try:
+        smtplibObj.sendmail(EMAIL_ADDRESS, email, msg)
+    except:
+        print("Internal error")
+        return json.dumps({"Success": False, "data": "Email is not valid!"}), 400
 
     return json.dumps({"Success": True, "data": student.serialize()}), 201
 
@@ -244,9 +273,10 @@ def delete_student(student_id):
 
 
 @app.route("/api/email/<int:club_id>/", methods=["POST"])
-def send_email(club_id):
+def send_club_email(club_id):
     club = Club.query.filter_by(id=club_id).first()
     if club is not None:
+        club_name = club.name
         students = club.serialize().get("students")
         contacts = []
         for student_id in students:
@@ -257,16 +287,17 @@ def send_email(club_id):
                 print("inside")
                 contacts.append(student.email)
 
-        EMAIL_ADDRESS = 'rz327@cornell.edu'
-        EMAIL_PASSWORD = 'jiqlphyelbbuioam'
+        EMAIL_ADDRESS = 'cornellclubby@gmail.com'
+        EMAIL_PASSWORD = 'niwdyzolidduwmug'
 
         smtplibObj = smtplib.SMTP('smtp.gmail.com', 587)
         smtplibObj.ehlo()
         smtplibObj.starttls()
         smtplibObj.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
-        subject = 'Clubby Email Notification'
-        body = 'Clubby email notification is working now.'
+        subject = 'Clubby email notification'
+        body = "    Application for " + club_name + " is open now! \n\n    To view application status, application " + (
+            "link and info session, visit http://3.134.77.241")
 
         msg = f'Subject: {subject}\n\n{body}'
 
